@@ -8,6 +8,7 @@ endif()
 find_package(ZLIB REQUIRED)
 
 add_library(rapid-tmx src/TmxMap.cpp external/base64/base64.cpp)
+add_library(rapid-tmx::rapid-tmx ALIAS rapid-tmx)
 target_include_directories(rapid-tmx PUBLIC include)
 target_include_directories(rapid-tmx PRIVATE external)
 target_link_libraries(rapid-tmx PRIVATE Boost::boost ZLIB::ZLIB)
@@ -23,3 +24,8 @@ install(TARGETS rapid-tmx
   ARCHIVE DESTINATION lib
   )
 install(DIRECTORY include/ DESTINATION include)
+
+set(CPACK_PACKAGE_CONTACT martin.kacprzak@gmail.com)
+set(CPACK_DEBIAN_PACKAGE_DEPENDS "zlib1g (>= 1:1.2.11.dfsg-1ubuntu2)")
+
+include(CPack)
