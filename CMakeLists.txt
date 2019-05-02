@@ -17,3 +17,9 @@ if(Boost_UNIT_TEST_FRAMEWORK_FOUND)
   enable_testing()
   add_subdirectory(tests)
 endif()
+
+install(TARGETS rapid-tmx
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib
+  )
+install(DIRECTORY include/ DESTINATION include)
