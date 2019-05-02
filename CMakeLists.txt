@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.12)
 project(rapid-tmx)
 
+option(BUILD_SHARED_LIBS "Build shared libraries." OFF)
+
 find_package(Boost REQUIRED)
 if(UNIX)
   find_package(Boost COMPONENTS unit_test_framework)
@@ -26,6 +28,7 @@ install(TARGETS rapid-tmx
 install(DIRECTORY include/ DESTINATION include)
 
 set(CPACK_PACKAGE_CONTACT martin.kacprzak@gmail.com)
-set(CPACK_DEBIAN_PACKAGE_DEPENDS "zlib1g (>= 1:1.2.11.dfsg-1ubuntu2)")
+# autogenerate dependency information
+set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
 
 include(CPack)
