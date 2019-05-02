@@ -351,9 +351,12 @@ static std::vector<unsigned char> decompress(std::string data, int expectedSize)
 
         switch (ret) {
             case Z_NEED_DICT:
+                /* FALLTHRU */
             case Z_STREAM_ERROR:
                 ret = Z_DATA_ERROR;
+                /* FALLTHRU */
             case Z_DATA_ERROR:
+                /* FALLTHRU */
             case Z_MEM_ERROR:
                 inflateEnd(&strm);
                 logZlibError(ret);

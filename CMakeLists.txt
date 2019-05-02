@@ -1,4 +1,4 @@
-cmake_minimum_required( VERSION 2.8 )
+cmake_minimum_required( VERSION 3.12 )
 project( rapid-tmx )
 
 find_package( Boost REQUIRED )
@@ -7,15 +7,9 @@ if( UNIX )
 endif()
 find_package( ZLIB REQUIRED )
 
-add_library(tmx
-  TmxMap.h
-  TmxMap.cpp
-  base64/base64.cpp
-)
-
-target_link_libraries( tmx
-  ${ZLIB_LIBRARIES}
-)
+add_library(rapid-tmx TmxMap.cpp base64/base64.cpp)
+target_include_directories(rapid-tmx PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_link_libraries(rapid-tmx PRIVATE Boost::boost ZLIB::ZLIB)
 
 # add_test_exec
 macro( add_test_exec test_name files libs )
