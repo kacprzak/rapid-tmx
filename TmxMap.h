@@ -4,8 +4,6 @@
 
 #include <string>
 #include <vector>
-#include <boost/utility.hpp> // noncopyable
-#include "rapidxml/rapidxml.hpp"
 
 namespace tmx {
 
@@ -54,11 +52,11 @@ struct Object
     unsigned gid; //!< 0 by default
     int x;
     int y;
-    int width;    //!< 0 by default
-    int height;   //!< 0 by default
-    std::string visible; //!< "1" by default
-    std::string shape;   //!< ellipse, polygon, polyline or null
-    std::vector<std::pair<int, int> > points; //!< polygon or polyline points
+    int width;                               //!< 0 by default
+    int height;                              //!< 0 by default
+    std::string visible;                     //!< "1" by default
+    std::string shape;                       //!< ellipse, polygon, polyline or null
+    std::vector<std::pair<int, int>> points; //!< polygon or polyline points
 
     std::vector<Property> properties;
 };
@@ -78,13 +76,13 @@ struct ObjectGroup
 
 //------------------------------------------------------------------------------
 
-class Map : private boost::noncopyable
+class Map
 {
- public:
+  public:
     Map();
     bool loadFromFile(const std::string& filename);
     const tmx::Tileset* tilesetForTile(unsigned gid) const;
- 
+
     std::string version;
     std::string orientation;
     int width;
@@ -98,13 +96,6 @@ class Map : private boost::noncopyable
     std::vector<ObjectGroup> objectGroups;
 
     std::vector<Property> properties;
-
- private:
-    void loadTilesets(rapidxml::xml_node<> *tileset_node);
-    void loadLayers(rapidxml::xml_node<> *layer_node);
-    void loadObjectGroups(rapidxml::xml_node<> *objectGroup_node);
-
-    std::vector<Property> loadProperties(rapidxml::xml_node<> *node) const;
 };
 
 } // namespace tmx
