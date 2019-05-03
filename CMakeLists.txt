@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.12)
-project(rapid-tmx)
+project(rapid-tmx VERSION 0.1.1)
 
 set(CMAKE_DEBUG_POSTFIX "-d")
 option(BUILD_SHARED_LIBS "Build shared libraries." OFF)
@@ -38,6 +38,17 @@ install(EXPORT rapid-xmlTargets
   NAMESPACE rapid-xml::
   DESTINATION lib/cmake/rapid-xml
   )
+
+include(CMakePackageConfigHelpers)
+write_basic_package_version_file(rapid-xmlConfigVersion.cmake
+  VERSION ${rapid-xml_VERSION}
+  COMPATIBILITY SameMajorVersion
+  )
+
+install(FILES
+  rapid-xmlConfig.cmake
+  ${CMAKE_CURRENT_BINARY_DIR}/rapid-xmlConfigVersion.cmake
+  DESTINATION lib/cmake/rapid-xml)
 
 set(CPACK_PACKAGE_CONTACT martin.kacprzak@gmail.com)
 # autogenerate dependency information
