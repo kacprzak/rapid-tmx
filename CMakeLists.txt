@@ -27,27 +27,27 @@ if(Boost_UNIT_TEST_FRAMEWORK_FOUND)
   add_subdirectory(tests)
 endif()
 
-install(TARGETS rapid-tmx EXPORT rapid-tmxTargets
+install(TARGETS rapid-tmx EXPORT rapid-tmx-targets
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib
   RUNTIME DESTINATION bin
   PUBLIC_HEADER DESTINATION include
   )
-install(EXPORT rapid-tmxTargets
-  FILE rapid-tmxTargets.cmake
+install(EXPORT rapid-tmx-targets
+  FILE rapid-tmx-targets.cmake
   NAMESPACE rapid-tmx::
   DESTINATION lib/cmake/rapid-tmx
   )
 
 include(CMakePackageConfigHelpers)
-write_basic_package_version_file(rapid-tmxConfigVersion.cmake
+write_basic_package_version_file(rapid-tmx-config-version.cmake
   VERSION ${rapid-tmx_VERSION}
   COMPATIBILITY SameMajorVersion
   )
 
 install(FILES
-  rapid-tmxConfig.cmake
-  ${CMAKE_CURRENT_BINARY_DIR}/rapid-tmxConfigVersion.cmake
+  rapid-tmx-config.cmake
+  ${CMAKE_CURRENT_BINARY_DIR}/rapid-tmx-config-version.cmake
   DESTINATION lib/cmake/rapid-tmx)
 
 set(CPACK_PACKAGE_CONTACT martin.kacprzak@gmail.com)
