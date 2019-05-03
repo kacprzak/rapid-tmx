@@ -21,7 +21,8 @@ target_include_directories(rapid-tmx
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>
   PRIVATE
-  external)
+  external
+  )
 set_target_properties(rapid-tmx PROPERTIES PUBLIC_HEADER "include/TmxMap.h")
 target_link_libraries(rapid-tmx PRIVATE Boost::boost ZLIB::ZLIB)
 
@@ -51,8 +52,9 @@ write_basic_package_version_file(${PROJECT_NAME}-config-version.cmake
 
 install(FILES
   ${PROJECT_NAME}-config.cmake
-  "${CMAKE_CURRENT_BINARY_DIR}/rapid-tmx-config-version.cmake"
-  DESTINATION lib/cmake/${PROJECT_NAME})
+  "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-config-version.cmake"
+  DESTINATION lib/cmake/${PROJECT_NAME}
+  )
 
 set(CPACK_PACKAGE_CONTACT martin.kacprzak@gmail.com)
 # autogenerate dependency information
