@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.12)
 project(rapid-tmx)
 
+set(CMAKE_DEBUG_POSTFIX "-d")
 option(BUILD_SHARED_LIBS "Build shared libraries." OFF)
 
 find_package(Boost REQUIRED)
@@ -11,8 +12,13 @@ find_package(ZLIB REQUIRED)
 
 add_library(rapid-tmx src/TmxMap.cpp external/base64/base64.cpp)
 add_library(rapid-tmx::rapid-tmx ALIAS rapid-tmx)
-target_include_directories(rapid-tmx PUBLIC include)
-target_include_directories(rapid-tmx PRIVATE external)
+target_include_directories(rapid-tmx
+  PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>
+  PRIVATE
+  external)
+set_target_properties(rapid-tmx PROPERTIES PUBLIC_HEADER "include/TmxMap.h")
 target_link_libraries(rapid-tmx PRIVATE Boost::boost ZLIB::ZLIB)
 
 if(Boost_UNIT_TEST_FRAMEWORK_FOUND)
@@ -21,11 +27,17 @@ if(Boost_UNIT_TEST_FRAMEWORK_FOUND)
   add_subdirectory(tests)
 endif()
 
-install(TARGETS rapid-tmx
+install(TARGETS rapid-tmx EXPORT rapid-xmlTargets
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib
+  RUNTIME DESTINATION bin
+  PUBLIC_HEADER DESTINATION include
   )
-install(DIRECTORY include/ DESTINATION include)
+install(EXPORT rapid-xmlTargets
+  FILE rapid-xmlTargets.cmake
+  NAMESPACE rapid-xml::
+  DESTINATION lib/cmake/rapid-xml
+  )
 
 set(CPACK_PACKAGE_CONTACT martin.kacprzak@gmail.com)
 # autogenerate dependency information
