@@ -6,6 +6,10 @@ inc = include_directories('include', 'external')
 zlib_dep = dependency('zlib')
 boost_dep = dependency('boost')
 
+cpp = meson.get_compiler('cpp')
+
+cpp.has_header('rapidxml/rapidxml.hpp')
+
 base64_src = files('external/base64/base64.cpp')
 
 subdir('include')
