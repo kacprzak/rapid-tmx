@@ -4,6 +4,7 @@ project('rapid-tmx', 'cpp',
 inc = include_directories('include', 'external')
 
 zlib_dep = dependency('zlib')
+boost_dep = dependency('boost')
 
 base64_src = files('external/base64/base64.cpp')
 
