@@ -9,6 +9,7 @@ boost_dep = dependency('boost')
 cpp = meson.get_compiler('cpp')
 
 cpp.has_header('rapidxml/rapidxml.hpp')
+cpp.has_header('rapidxml/rapidxml_utils.hpp')
 
 base64_src = files('external/base64/base64.cpp')
 
