@@ -24,6 +24,10 @@ rapid_tmx_dep = declare_dependency(
 
 subdir('tests')
 
+pkg = import('pkgconfig')
+pkg.generate(lib,
+             description: 'Tiled level editor tmx files support.')
+
 ln = find_program('ln')
 
 run_command(ln, '-sf',
