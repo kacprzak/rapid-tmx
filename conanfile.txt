@@ -1,0 +1,7 @@
+[requires]
+zlib/1.2.11
+rapidxml/1.13
+boost/1.69.0
+
+[generators]
+pkg_config

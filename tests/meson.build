@@ -1,4 +1,7 @@
-boost_dep = dependency('boost', modules: ['unit_test_framework'])
+boost_dep = dependency('boost',
+                       modules: ['unit_test_framework'],
+                       required: false,
+                       disabler: true)
 
 test_exe = executable('map_test', 'map_test.cpp',
                       include_directories: inc,
