@@ -22,7 +22,7 @@ subdir('src')
 rapid_tmx_dep = declare_dependency(
   include_directories: include_directories('include'),
   link_with: lib,
-  dependencies: [zlib_dep, boost_dep, rapidxml_dep]
+  dependencies: [zlib_dep]
 )
 
 subdir('tests')
