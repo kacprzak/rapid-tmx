@@ -21,8 +21,7 @@ subdir('src')
 
 rapid_tmx_dep = declare_dependency(
   include_directories: include_directories('include'),
-  link_with: lib,
-  dependencies: [zlib_dep]
+  link_with: lib
 )
 
 subdir('tests')
