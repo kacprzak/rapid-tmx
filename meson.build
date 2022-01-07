@@ -10,8 +10,8 @@ rapidxml_dep = dependency('rapidxml', required: false)
 if not rapidxml_dep.found()
    cpp = meson.get_compiler('cpp')
 
-   cpp.has_header('rapidxml/rapidxml.hpp')
-   cpp.has_header('rapidxml/rapidxml_utils.hpp')
+   cpp.has_header('rapidxml/rapidxml.hpp', required: true)
+   cpp.has_header('rapidxml/rapidxml_utils.hpp', required: true)
 endif
 
 base64_src = files('external/base64/base64.cpp')
