@@ -4,12 +4,34 @@
 #include "base64/base64.h"
 #include "rapidxml/rapidxml.hpp"
 #include "rapidxml/rapidxml_utils.hpp"
-
-#include <boost/algorithm/string.hpp>
-#include <boost/lexical_cast.hpp>
 #include <boost/tokenizer.hpp>
 #include <iostream>
 #include <zlib.h>
+
+#include <algorithm>
+#include <cctype>
+#include <locale>
+
+// See: https://stackoverflow.com/questions/216823/how-to-trim-a-stdstring
+// trim from start (in place)
+static inline void ltrim(std::string &s) {
+    s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](unsigned char ch) {
+        return !std::isspace(ch);
+    }));
+}
+
+// trim from end (in place)
+static inline void rtrim(std::string &s) {
+    s.erase(std::find_if(s.rbegin(), s.rend(), [](unsigned char ch) {
+        return !std::isspace(ch);
+    }).base(), s.end());
+}
+
+// trim from both ends (in place)
+static inline void trim(std::string &s) {
+    ltrim(s);
+    rtrim(s);
+}
 
 static std::vector<unsigned char> decompress(std::string data, int expectedSize = 256);
 
@@ -50,10 +72,10 @@ bool Map::loadFromFile(const std::string& filename)
     try {
         version     = map_node->first_attribute("version")->value();
         orientation = map_node->first_attribute("orientation")->value();
-        width       = lexical_cast<int>(map_node->first_attribute("width")->value());
-        height      = lexical_cast<int>(map_node->first_attribute("height")->value());
-        tileWidth   = lexical_cast<int>(map_node->first_attribute("tilewidth")->value());
-        tileHeight  = lexical_cast<int>(map_node->first_attribute("tileheight")->value());
+        width       = std::stoi(map_node->first_attribute("width")->value());
+        height      = std::stoi(map_node->first_attribute("height")->value());
+        tileWidth   = std::stoi(map_node->first_attribute("tilewidth")->value());
+        tileHeight  = std::stoi(map_node->first_attribute("tileheight")->value());
 
         xml_attribute<>* bgColor_attr = map_node->first_attribute("backgroundcolor");
         if (bgColor_attr) backgroundColor = bgColor_attr->value();
@@ -69,7 +91,7 @@ bool Map::loadFromFile(const std::string& filename)
         xml_node<>* objectGroup_node = map_node->first_node("objectgroup");
         objectGroups                 = loadObjectGroups(objectGroup_node);
 
-    } catch (const bad_lexical_cast& e) {
+    } catch (const std::invalid_argument& e) {
         std::cerr << e.what() << std::endl;
         return false;
     }
@@ -89,25 +111,25 @@ std::vector<Tileset> loadTilesets(rapidxml::xml_node<>* tileset_node)
         Tileset tileset;
 
         tileset.firstGid =
-            lexical_cast<unsigned>(tileset_node->first_attribute("firstgid")->value());
+            std::stoul(tileset_node->first_attribute("firstgid")->value());
         tileset.name      = tileset_node->first_attribute("name")->value();
-        tileset.tileWidth = lexical_cast<int>(tileset_node->first_attribute("tilewidth")->value());
+        tileset.tileWidth = std::stoi(tileset_node->first_attribute("tilewidth")->value());
         tileset.tileHeight =
-            lexical_cast<int>(tileset_node->first_attribute("tileheight")->value());
+            std::stoi(tileset_node->first_attribute("tileheight")->value());
         tileset.imageSource = tileset_node->first_node("image")->first_attribute("source")->value();
 
         tileset.spacing               = 0;
         xml_attribute<>* spacing_attr = tileset_node->first_attribute("spacing");
-        if (spacing_attr) tileset.spacing = lexical_cast<int>(spacing_attr->value());
+        if (spacing_attr) tileset.spacing = std::stoi(spacing_attr->value());
 
         tileset.margin               = 0;
         xml_attribute<>* margin_attr = tileset_node->first_attribute("margin");
-        if (margin_attr) tileset.margin = lexical_cast<int>(margin_attr->value());
+        if (margin_attr) tileset.margin = std::stoi(margin_attr->value());
 
         xml_node<>* image_node = tileset_node->first_node("image");
         tileset.imageSource    = image_node->first_attribute("source")->value();
-        tileset.imageWidth     = lexical_cast<int>(image_node->first_attribute("width")->value());
-        tileset.imageHeight    = lexical_cast<int>(image_node->first_attribute("height")->value());
+        tileset.imageWidth     = std::stoi(image_node->first_attribute("width")->value());
+        tileset.imageHeight    = std::stoi(image_node->first_attribute("height")->value());
 
         tilesets.push_back(tileset);
         tileset_node = tileset_node->next_sibling("tileset");
@@ -128,8 +150,8 @@ std::vector<Layer> loadLayers(rapidxml::xml_node<>* layer_node)
         Layer layer;
 
         layer.name   = layer_node->first_attribute("name")->value();
-        layer.width  = lexical_cast<int>(layer_node->first_attribute("width")->value());
-        layer.height = lexical_cast<int>(layer_node->first_attribute("height")->value());
+        layer.width  = std::stoi(layer_node->first_attribute("width")->value());
+        layer.height = std::stoi(layer_node->first_attribute("height")->value());
 
         layer.visible                 = "1";
         xml_attribute<>* visible_attr = layer_node->first_attribute("visible");
@@ -151,12 +173,12 @@ std::vector<Layer> loadLayers(rapidxml::xml_node<>* layer_node)
             boost::char_separator<char> sep(", \t\n\r");
             boost::tokenizer<boost::char_separator<char>> tok(data, sep);
             for (auto it = tok.begin(); it != tok.end(); ++it) {
-                layer.data.push_back(lexical_cast<unsigned>(*it));
+                layer.data.push_back(std::stoul(*it));
             }
         } else if (layer.dataEncoding == "base64") {
 
             std::string nodevalue = data_node->value();
-            boost::algorithm::trim(nodevalue);
+            trim(nodevalue);
 
             std::vector<unsigned char> data;
             if (layer.compression.empty()) {
@@ -198,9 +220,9 @@ std::vector<ObjectGroup> loadObjectGroups(rapidxml::xml_node<>* objectGroup_node
         ObjectGroup objectGroup;
 
         objectGroup.name  = objectGroup_node->first_attribute("name")->value();
-        objectGroup.width = lexical_cast<int>(objectGroup_node->first_attribute("width")->value());
+        objectGroup.width = std::stoi(objectGroup_node->first_attribute("width")->value());
         objectGroup.height =
-            lexical_cast<int>(objectGroup_node->first_attribute("height")->value());
+            std::stoi(objectGroup_node->first_attribute("height")->value());
 
         objectGroup.properties = loadProperties(objectGroup_node);
 
@@ -216,16 +238,16 @@ std::vector<ObjectGroup> loadObjectGroups(rapidxml::xml_node<>* objectGroup_node
             if (type_attr) object.type = type_attr->value();
 
             xml_attribute<>* gid_attr = object_node->first_attribute("gid");
-            object.gid                = (gid_attr) ? lexical_cast<unsigned>(gid_attr->value()) : 0;
+            object.gid                = (gid_attr) ? std::stoul(gid_attr->value()) : 0;
 
-            object.x = lexical_cast<int>(object_node->first_attribute("x")->value());
-            object.y = lexical_cast<int>(object_node->first_attribute("y")->value());
+            object.x = std::stoi(object_node->first_attribute("x")->value());
+            object.y = std::stoi(object_node->first_attribute("y")->value());
 
             xml_attribute<>* width_attr = object_node->first_attribute("width");
-            object.width = (width_attr) ? lexical_cast<unsigned>(width_attr->value()) : 0;
+            object.width = (width_attr) ? std::stoul(width_attr->value()) : 0;
 
             xml_attribute<>* height_attr = object_node->first_attribute("height");
-            object.height = (height_attr) ? lexical_cast<unsigned>(height_attr->value()) : 0;
+            object.height = (height_attr) ? std::stoul(height_attr->value()) : 0;
 
             object.visible                = "1";
             xml_attribute<>* visible_attr = object_node->first_attribute("visible");
@@ -251,9 +273,9 @@ std::vector<ObjectGroup> loadObjectGroups(rapidxml::xml_node<>* objectGroup_node
                 boost::char_separator<char> sep(", ");
                 boost::tokenizer<boost::char_separator<char>> tok(pointsStr, sep);
                 for (auto it = tok.begin(); it != tok.end(); ++it) {
-                    int x = lexical_cast<int>(*it);
+                    int x = std::stoi(*it);
                     ++it;
-                    int y = lexical_cast<int>(*it);
+                    int y = std::stoi(*it);
 
                     object.points.push_back(std::pair<int, int>(x, y));
                 }
