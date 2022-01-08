@@ -2,5 +2,6 @@ build/
 release/
 debug/
 
-_.*/
+_*/
+.cache/
 /compile_commands.json
