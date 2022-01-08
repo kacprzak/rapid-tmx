@@ -8,7 +8,7 @@ class RapidTmxConan(ConanFile):
     default_options = {"shared": False, "fPIC": True}
     generators = "pkg_config"
     exports_sources = "meson.build", "include/*", "src/*", "external/*", "tests/*"
-    requires = "zlib/1.2.11", "boost/1.69.0", "rapidxml/1.13"
+    requires = "zlib/1.2.11", "rapidxml/1.13"
 
     def config_options(self):
         if self.settings.os == "Windows":
