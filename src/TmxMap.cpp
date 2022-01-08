@@ -4,7 +4,8 @@
 #include "base64/base64.h"
 #include "rapidxml/rapidxml.hpp"
 #include "rapidxml/rapidxml_utils.hpp"
-#include <boost/tokenizer.hpp>
+
+#include <cstring>
 #include <iostream>
 #include <zlib.h>
 
@@ -36,8 +37,6 @@ static inline void trim(std::string &s) {
 static std::vector<unsigned char> decompress(std::string data, int expectedSize = 256);
 
 namespace tmx {
-
-using namespace boost;
 
 std::vector<Tileset> loadTilesets(rapidxml::xml_node<>* tileset_node);
 std::vector<Layer> loadLayers(rapidxml::xml_node<>* layer_node);
@@ -168,12 +167,15 @@ std::vector<Layer> loadLayers(rapidxml::xml_node<>* layer_node)
 
         if (layer.dataEncoding == "csv") {
 
-            std::string data = data_node->value();
+            char* data = data_node->value();
 
-            boost::char_separator<char> sep(", \t\n\r");
-            boost::tokenizer<boost::char_separator<char>> tok(data, sep);
-            for (auto it = tok.begin(); it != tok.end(); ++it) {
-                layer.data.push_back(std::stoul(*it));
+            const char* sep = ", \t\n\r";
+            while (*data != '\0') {
+                std::size_t pos;
+                layer.data.push_back(std::stoul(data, &pos));
+                data += pos;
+                pos = std::strspn(data, sep);
+                data += pos;
             }
         } else if (layer.dataEncoding == "base64") {
 
@@ -268,14 +270,21 @@ std::vector<ObjectGroup> loadObjectGroups(rapidxml::xml_node<>* objectGroup_node
             }
 
             if (readPoints) {
-                std::string pointsStr = shape_node->first_attribute("points")->value();
+                char* points = shape_node->first_attribute("points")->value();
+                const char* sep = ", ";
 
-                boost::char_separator<char> sep(", ");
-                boost::tokenizer<boost::char_separator<char>> tok(pointsStr, sep);
-                for (auto it = tok.begin(); it != tok.end(); ++it) {
-                    int x = std::stoi(*it);
-                    ++it;
-                    int y = std::stoi(*it);
+                while(*points != '\0') {
+                    std::size_t pos;
+
+                    int x = std::stoi(points, &pos);
+                    points += pos;
+                    pos = std::strspn(points, sep);
+                    points += pos;
+
+                    int y = std::stoi(points, &pos);
+                    points += pos;
+                    pos = std::strspn(points, sep);
+                    points += pos;
 
                     object.points.push_back(std::pair<int, int>(x, y));
                 }
