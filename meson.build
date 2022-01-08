@@ -4,9 +4,8 @@ project('rapid-tmx', 'cpp',
 inc = include_directories('include', 'external')
 
 zlib_dep = dependency('zlib')
-boost_dep = dependency('boost')
-rapidxml_dep = dependency('rapidxml', required: false)
 
+rapidxml_dep = dependency('rapidxml', required: false)
 if not rapidxml_dep.found()
    cpp = meson.get_compiler('cpp')
 
