@@ -19,8 +19,8 @@ subdir('include')
 subdir('src')
 
 rapid_tmx_dep = declare_dependency(
-  include_directories: include_directories('include'),
-  link_with: lib
+   include_directories: include_directories('include'),
+   link_with: lib
 )
 
 subdir('tests')
